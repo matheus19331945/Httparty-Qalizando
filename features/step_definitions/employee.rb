@@ -3,12 +3,12 @@ Dado('que o usuario consulte informacoes de Funcionarios') do
   end
   
   Quando('ele realizar a pesquisa') do
-    @list_employee = HTTParty.get(@get_url) # Armazenando a ação do get da minha URL no HTTParty, ele permite que eu faça requisições
+    @update_employee = HTTParty.get(@get_url) # Armazenando a ação do get da minha URL no HTTParty, ele permite que eu faça requisições
   end
   
   Entao('uma lista de funcionarios deve retornar') do
-    expect(@list_employee.code).to eql 200 # Compara o código recebido com 200 e a mensagem
-    expect(@list_employee.message).to eql 'OK'
+    expect(@update_employee.code).to eql 200 # Compara o código recebido com 200 e a mensagem
+    expect(@update_employee.message).to eql 'OK'
   end
 
   Dado('que o usuario cadastre um novo funcionario') do
@@ -31,4 +31,26 @@ Dado('que o usuario consulte informacoes de Funcionarios') do
     puts @create_employee.message
     puts @create_employee["id"] #Printar o código, mensagem e o ID retornado no JSON, se estiver dentro de uma tag informa-lá antes, por ex. ['data'] ["employee_name"], usando o método .parsed_response para garantir que o valor será retornado em string
     #Como puxar um valor inteiro puts @create_employee["id"].to eql (11)
+  end
+
+
+  Dado('que o usuario altere uma informacao de funcionario') do
+    @get_employee = HTTParty.get('https://jsonplaceholder.typicode.com/users', :headers => {'Content-Type': 'application/json'})
+    puts @get_employee[0]['id']
+    @put_url = 'https://jsonplaceholder.typicode.com/users/' + @get_employee[0]['id'].to_s
+  end
+  
+  Quando('ele enviar as novas informacoes') do
+    @update_employee = HTTParty.put(@put_url, :headers => {'Content-Type': 'application/json'}, body: { # Corpo do put enviado
+    "name": "Matheus Santos",
+    "email": "matheus@teste.com"
+    }.to_json)
+
+    puts @update_employee
+  end
+  
+  Entao('as informacoes serao alteradas') do
+    expect(@update_employee.code).to eql 200
+    expect(@update_employee.message).to eql 'OK'
+    expect(@update_employee['id']).to eql 1
   end
