@@ -54,3 +54,22 @@ Dado('que o usuario consulte informacoes de Funcionarios') do
     expect(@update_employee.message).to eql 'OK'
     expect(@update_employee['id']).to eql 1
   end
+
+
+  Dado('que o usuario queira deletar um funcionario') do
+    @get_employee = HTTParty.get('https://jsonplaceholder.typicode.com/users', :headers => {'Content-Type': 'application/json'})
+    puts @get_employee[0]['id']
+    @delete_url = 'https://jsonplaceholder.typicode.com/users/15' + @get_employee[0]['id'].to_s 
+    #Acrescentamos esse get pois não é uma boa prática fixar o id na url, de forma que as consultas serão feitas pelo primeiro
+    #usuario da lista
+  end
+  
+  Quando('ele enviar a identificacao unica') do
+    @delete_employee = HTTParty.delete(@delete_url, :headers => {'Content-Type': 'application/json'})
+    puts @delete_employee
+  end
+  
+  Entao('esse funcionario sera deletado do sistema') d
+    expect(@update_employee.code).to eql 200
+    expect(@update_employee.message).to eql 'OK'
+  end
